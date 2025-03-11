@@ -1,0 +1,83 @@
+// package.json
+{
+  "name": "manju-resume-builder",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "jspdf": "latest"
+  }
+}
+
+// pages/index.js
+import Head from 'next/head';
+import { useState } from 'react';
+import ResumePreview from '../components/ResumePreview';
+import { generatePDF } from '../utils/pdfGenerator';
+
+export default function Home() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    education: '',
+    experience: '',
+    skills: ''
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  return (
+    <div>
+      <Head>
+        <title>Manju Resume Builder</title>
+      </Head>
+      <h1>Manju Resume Builder</h1>
+      <input type="text" name="name" placeholder="Name" onChange={handleChange} />
+      <input type="text" name="email" placeholder="Email" onChange={handleChange} />
+      <input type="text" name="phone" placeholder="Phone" onChange={handleChange} />
+      <input type="text" name="education" placeholder="Education" onChange={handleChange} />
+      <input type="text" name="experience" placeholder="Experience" onChange={handleChange} />
+      <input type="text" name="skills" placeholder="Skills" onChange={handleChange} />
+      <ResumePreview formData={formData} />
+      <button onClick={() => generatePDF(formData)}>Download PDF</button>
+    </div>
+  );
+}
+
+// components/ResumePreview.js
+export default function ResumePreview({ formData }) {
+  return (
+    <div>
+      <h2>Preview</h2>
+      <p>Name: {formData.name}</p>
+      <p>Email: {formData.email}</p>
+      <p>Phone: {formData.phone}</p>
+      <p>Education: {formData.education}</p>
+      <p>Experience: {formData.experience}</p>
+      <p>Skills: {formData.skills}</p>
+    </div>
+  );
+}
+
+// utils/pdfGenerator.js
+import jsPDF from 'jspdf';
+export function generatePDF(formData) {
+  const doc = new jsPDF();
+  doc.text(`Name: ${formData.name}`, 10, 10);
+  doc.text(`Email: ${formData.email}`, 10, 20);
+  doc.text(`Phone: ${formData.phone}`, 10, 30);
+  doc.text(`Education: ${formData.education}`, 10, 40);
+  doc.text(`Experience: ${formData.experience}`, 10, 50);
+  doc.text(`Skills: ${formData.skills}`, 10, 60);
+  doc.save('resume.pdf');
+}
